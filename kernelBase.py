@@ -1,6 +1,11 @@
 from CSRL_math import *
 from kernel import *
 import numpy as np
+import scienceplots
+import matplotlib.pyplot as plt
+
+# latex style plots 
+plt.style.use(["default","no-latex"])
 
 class kernelBase:
 
@@ -60,20 +65,95 @@ class kernelBase:
             return - math.log( x_in ) / self.a_x
         
     # Reurns the base values in an array for specific phase variable value (x)
-    def get_psi_vals(self, x_in):
+    def get_psi_vals_x(self, x_in):
 
         # phase var -> time
         t = self.ksi_inv(x_in)
 
-      
+        # init psi_vals
+        psi_vals = self.get_psi_vals_t(t)
+
+        # return array
+        return psi_vals
+    
+    # Reurns the base values in an array for specific time instance (t)
+    def get_psi_vals_t(self, t_in):
+
         # init psi_vals
         psi_vals = np.zeros(self.N)
         for i in range(self.N):
             # get kernel value for this instance
-            psi_vals[i] = self.kernelArray[i].psi(t)
+            psi_vals[i] = self.kernelArray[i].psi(t_in)
 
         # return array
         return psi_vals
+    
+    # Plots the kernel base in time
+    def plot_t(self):
+
+        # plot points
+        N_points = 1000
+
+        # time array
+        t_array = np.linspace(0, 1.2 * self.totalTime , N_points)
+
+        # kernel value array
+        y_array = np.zeros((self.N , N_points))
+        i = 0
+        
+        # find the values in time 
+        for ti in t_array:  
+            y_array[:,i] = self.get_psi_vals_t(ti)
+            i = i + 1
+
+        # plot all kernels
+        for i in range(self.N):
+            plt.plot(t_array,y_array[i,:])
+
+        # aesthetics and labeling 
+        plt.xlabel('$t$ (s)',fontsize=14 )
+        plt.ylabel('$\psi_i(t)$',fontsize=14 )
+        plt.xlim(0 , 1.2* self.totalTime)
+        plt.grid()
+        plt.show()
+
+
+    # Plots the kernel base as a function of phase variable x
+    def plot_x(self):
+
+        # plot points
+        N_points = 1000
+
+        # the min value of x if linear or exponential 
+        if self.xType == 'linear':
+            # x is 0 at the start of the motion 
+            xmin = 0
+        else:
+            # find x at the end of the motion 
+            xmin = self.ksi(self.totalTime)
+
+        # create the x array 
+        x_array = np.linspace(xmin, 1 , N_points)
+
+        # array of the kernel values
+        y_array = np.zeros((self.N , N_points))
+        i = 0
+        
+        # compute the kernel values
+        for xi in x_array:
+            y_array[:,i] = self.get_psi_vals_x(xi)
+            i = i + 1
+
+        # plot results 
+        for i in range(self.N):
+            plt.plot(x_array,y_array[i,:])
+
+        # aesthetics and labeling
+        plt.xlabel('$x$',fontsize=14 )
+        plt.ylabel('$\psi_i(x)$',fontsize=14 )
+        plt.xlim(xmin,1)
+        plt.grid()
+        plt.show()
     
    
 
