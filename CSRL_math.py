@@ -12,7 +12,7 @@ def sinc(x):
         return math.sin(x)/x 
         
 
-# the sinc function
+# the moving average filter (non-causal)
 def maFilter(x, ncoeffs):
    
     MA_coeffs = np.ones(ncoeffs)/ncoeffs
