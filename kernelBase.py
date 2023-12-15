@@ -62,6 +62,7 @@ class kernelBase:
         if self.xType == 'linear':
             return x_in * self.totalTime
         else: # # canonical system is exponential 
+            print(x_in)
             return - math.log( x_in ) / self.a_x
         
     # Reurns the base values in an array for specific phase variable value (x)
@@ -114,6 +115,7 @@ class kernelBase:
         plt.xlabel('$t$ (s)',fontsize=14 )
         plt.ylabel('$\psi_i(t)$',fontsize=14 )
         plt.xlim(0 , 1.2* self.totalTime)
+        plt.title('Kernel bases in $t$. $N$=' + str(self.N),fontsize=14 )
         plt.grid()
         plt.show()
 
@@ -149,8 +151,10 @@ class kernelBase:
             plt.plot(x_array,y_array[i,:])
 
         # aesthetics and labeling
+        
         plt.xlabel('$x$',fontsize=14 )
         plt.ylabel('$\psi_i(x)$',fontsize=14 )
+        plt.title('Kernel bases in $x$. $N$=' + str(self.N),fontsize=14 )
         plt.xlim(xmin,1)
         plt.grid()
         plt.show()

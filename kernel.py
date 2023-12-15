@@ -54,6 +54,7 @@ class kernel:
         # aesthetics and labeling
         plt.xlabel('$x$',fontsize=14 )
         plt.ylabel('$\psi(x)$',fontsize=14 )
+        plt.title(self.type + ' kernel function. $c$=' + str(self.c) + ', $h$=' + str(self.h) , fontsize=14 )
         plt.grid()
         plt.show()
         

@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 # 3.14159...
 pi = math.pi
@@ -9,6 +10,16 @@ def sinc(x):
         return 1.0
     else:
         return math.sin(x)/x 
+        
+
+# the sinc function
+def maFilter(x, ncoeffs):
+   
+    MA_coeffs = np.ones(ncoeffs)/ncoeffs
+    y_f = np.convolve(x, MA_coeffs)
+    y = y_f[-x.size:]
+
+    return y
         
 
 
