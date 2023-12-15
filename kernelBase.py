@@ -62,7 +62,6 @@ class kernelBase:
         if self.xType == 'linear':
             return x_in * self.totalTime
         else: # # canonical system is exponential 
-            print(x_in)
             return - math.log( x_in ) / self.a_x
         
     # Reurns the base values in an array for specific phase variable value (x)

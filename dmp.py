@@ -60,7 +60,8 @@ class dmp:
             f = self.W @ Psi / np.sum(Psi)
 
         # the derivative of the z state 
-        zdot = self.a * ( self.b * ( self.g - y) - z ) + (self.g - self.y0) * f
+        s = 1 - sigmoid(self.kb.ksi_inv(x), 1.0*self.T , 0.05*self.T) 
+        zdot = self.a * ( self.b * ( self.g - y) - z ) + s * (self.g - self.y0) * f
 
         # print(xdot)
         # return the time scaled derivative of the state 
