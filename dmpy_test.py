@@ -4,6 +4,7 @@ from CSRL_math import *
 from orientation import *
 import scipy.io
 import pathlib
+import os
 
 
 from dmp import *
@@ -95,7 +96,12 @@ canonicalType = 'linear' # other option: exponential
 
 ########### Test single axis dmp
 folderPath = pathlib.Path(__file__).parent.resolve()
-data = scipy.io.loadmat(str(folderPath) +'\\example_data.mat')
+
+if os.name == 'nt': # the OS is Windows
+    data = scipy.io.loadmat(str(folderPath) +'\\example_data.mat')
+else:   # the OS is Linux
+    data = scipy.io.loadmat(str(folderPath) +'/example_data.mat')
+
 pd = data['p1']
 
 yd = pd[:,1]
