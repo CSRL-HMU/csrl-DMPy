@@ -35,7 +35,7 @@ def logErrorDerivative(A, Ad, omega, omegad):
     R = enforceRot(A) 
     Rd = enforceRot(Ad) 
 
-    return omega - R*np.transpose(Rd)*omegad
+    return omega - R @ np.transpose(Rd) @ omegad
 
 
 # returns the quaternion form of a rotation matrix R
