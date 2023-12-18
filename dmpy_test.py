@@ -1,8 +1,10 @@
 from kernel import *
 from kernelBase import *
 from CSRL_math import *
+from orientation import *
 import scipy.io
 import pathlib
+
 
 from dmp import *
 
@@ -18,7 +20,7 @@ canonicalType = 'linear' # other option: exponential
 ########### Test kernel base
 # kb = kernelBase(10, 5, kernelType, canonicalType, 0.5)
 
-# kb.plot_t()
+# kb.plot_t() 
 # kb.plot_x()
 
 ########### Test 5th order
@@ -67,8 +69,31 @@ canonicalType = 'linear' # other option: exponential
 # plt.show()
     
 
+########### Test orientation transitions 
+# R = np.array([[ 0, 1, 0],
+#               [-1, 0, 0],
+#               [ 0, 0, 1]])
 
-########### Test dmp
+# print('R=',R)
+# print('Q=',rot2quat(R))
+# print('R=',quat2rot(rot2quat(R)))
+
+
+########### Test quaternion functions 
+# R = np.identity(3)
+# Rd = rotZ(pi-0.001) 
+
+# # Q = rot2quat(R)
+# # Qd = rot2quat(Rd)
+
+# print('[log] e=',logError(R,Rd))
+# print('[vect] e=',vectorError(R,Rd))
+
+
+
+
+
+########### Test single axis dmp
 folderPath = pathlib.Path(__file__).parent.resolve()
 data = scipy.io.loadmat(str(folderPath) +'\\example_data.mat')
 pd = data['p1']
@@ -82,19 +107,25 @@ t = np.array(list(range(yd.size))) * dt
 dmpx = dmp(40, t[-1], kernelType, canonicalType)
 dmpx.train(dt, yd)
 
-state = np.array([0, yd[0], 0])
+# y_offset = 0.1
+# goal_offset = 0.1
+# tau = 0.7
+y_offset = 0.0
+goal_offset = 0.0
+tau = 1
+
+
+state = np.array([0, yd[0]+y_offset, 0])
 state_dot = np.zeros(3)
 
-# dmpx.set_init_position(yd[0]+0.1)
-
-# dmpx.set_goal(yd[-1]+0.1)
-
-# dmpx.set_tau(0.7)
+dmpx.set_init_position(yd[0]+y_offset)
+dmpx.set_goal(yd[-1]+goal_offset)
+dmpx.set_tau(tau)
 
 i = 0
 for ti in t:
     state = state + state_dot * dt
-    state_dot = dmpx.get_state_dot( state[0], state[1], state[2])
+    state_dot[0], state_dot[1], state_dot[2] = dmpx.get_state_dot( state[0], state[1], state[2])
     y[i] = state[1]
     i = i + 1
 
@@ -110,4 +141,3 @@ plt.grid()
 plt.show()
     
 
-plt.show()

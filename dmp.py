@@ -39,7 +39,7 @@ class dmp:
     def set_tau(self, tau_in):
         self.tau = tau_in
 
-    def get_state_dot(self, x, y, z):
+    def get_state_dot(self, x, y, z, customScale = False, scalingTerm = 1):
         
         # get the derivative of te canonical system
         if self.xType == 'linear':
@@ -61,13 +61,16 @@ class dmp:
 
         # the derivative of the z state 
         s = 1 - sigmoid(self.kb.ksi_inv(x), 1.0*self.T , 0.05*self.T) 
-        zdot = self.a * ( self.b * ( self.g - y) - z ) + s * (self.g - self.y0) * f
+        if not customScale:
+            scalingTerm = (self.g - self.y0)
+
+        zdot = self.a * ( self.b * ( self.g - y) - z ) + s * scalingTerm * f
 
         # print(xdot)
         # return the time scaled derivative of the state 
-        return np.array([xdot, ydot, zdot])/self.tau
+        return xdot/self.tau, ydot/self.tau, zdot/self.tau
     
-    def train(self, dt, y_array, plotEn = False):
+    def train(self, dt, y_array, plotEn = False, customScale = False, scalingTerm = 1):
 
         # make sure that this is numpy array
         y_array = np.array(y_array)
@@ -107,8 +110,11 @@ class dmp:
             x_array[i] =  self.kb.ksi(ti)
             i = i + 1
 
+        if not customScale:
+            scalingTerm = (self.g - self.y0)
+
         #compute the demonstrated forcing term
-        fd_array = ( zdot_array - self.a * ( self.b * ( self.g - y_array) - z_array ) ) / (self.g - self.y0)
+        fd_array = ( zdot_array - self.a * ( self.b * ( self.g - y_array) - z_array ) ) / scalingTerm
 
         # train and set the weights W 
         if self.kernelType == 'sinc':

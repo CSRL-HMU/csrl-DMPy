@@ -58,6 +58,26 @@ def sigmoid(x, c, h):
 
     return y[0,0]
     
+
+# returns the skew symmetric matrix for a vector x
+def skewSymmetric(x):
+    
+    S = np.array([[0,    -x[2], x[1]], 
+                 [x[2],  0,     -x[0]],
+                 [-x[1], x[0],  0]])
+    
+    return S
+
+# returns the vector x corresponding to the skew symmetric matrix S 
+def skewSymmetricInv(S):
+    
+    x = np.zeros(3)
+    x[0] = (S[2,1]-S[1,2])/2.0
+    x[1] = (S[0,2]-S[2,0])/2.0
+    x[2] = (S[0,1]-S[1,0])/2.0
+    
+    return x
+    
         
 
 
