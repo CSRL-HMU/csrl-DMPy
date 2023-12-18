@@ -215,7 +215,7 @@ def enforceRot(A):
     else: # A is quaternion
         R = quat2rot(A) 
 
-    return A
+    return R
 
 
 
