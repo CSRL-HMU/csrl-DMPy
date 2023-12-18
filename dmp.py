@@ -9,7 +9,7 @@ plt.style.use(["default","no-latex"])
 
 class dmp:
 
-    def __init__(self, N_in, T_in, kernelType_in, xType_in, a_x_in = 1.0, a_in=1.0, b_in=4.0, tau_in=1.0):
+    def __init__(self, N_in, T_in, kernelType_in, xType_in, a_x_in = 1.0, a_in=20.0, b_in=0.8, tau_in=1.0):
         self.N = N_in
         self.T = T_in
         self.kernelType = kernelType_in
@@ -66,6 +66,7 @@ class dmp:
 
         zdot = self.a * ( self.b * ( self.g - y) - z ) + s * scalingTerm * f
 
+
         # print(xdot)
         # return the time scaled derivative of the state 
         return xdot/self.tau, ydot/self.tau, zdot/self.tau
@@ -91,6 +92,7 @@ class dmp:
         # set initial state and goal
         self.y0 = y_array[0]
         self.g = y_array[-1]
+  
         
         # initialize the kernelBase
         self.kb = kernelBase(self.N,  self.T, self.kernelType, self.xType, self.a_x)

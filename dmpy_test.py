@@ -2,9 +2,11 @@ from kernel import *
 from kernelBase import *
 from CSRL_math import *
 from orientation import *
+from dmpSE3 import *
 import scipy.io
 import pathlib
 import os
+
 
 
 from dmp import *
@@ -95,55 +97,136 @@ canonicalType = 'linear' # other option: exponential
 
 
 ########### Test single axis dmp
+# folderPath = pathlib.Path(__file__).parent.resolve()
+
+# if os.name == 'nt': # the OS is Windows
+#     data = scipy.io.loadmat(str(folderPath) +'\\example_data.mat')
+# else:   # the OS is Linux
+#     data = scipy.io.loadmat(str(folderPath) +'/example_data.mat')
+
+# pd = data['p1']
+
+# yd = pd[:,1]
+# y = np.zeros(yd.size)
+
+# dt = 0.001
+# t = np.array(list(range(yd.size))) * dt
+
+# dmpx = dmp(40, t[-1], kernelType, canonicalType)
+# dmpx.train(dt, yd)
+
+# # y_offset = 0.1
+# # goal_offset = 0.1
+# # tau = 0.7
+# y_offset = 0.0
+# goal_offset = 0.0
+# tau = 1
+
+
+# state = np.array([0, yd[0]+y_offset, 0])
+# state_dot = np.zeros(3)
+
+# dmpx.set_init_position(yd[0]+y_offset)
+# dmpx.set_goal(yd[-1]+goal_offset)
+# dmpx.set_tau(tau)
+
+# i = 0
+# for ti in t:
+#     state = state + state_dot * dt
+#     state_dot[0], state_dot[1], state_dot[2] = dmpx.get_state_dot( state[0], state[1], state[2])
+#     y[i] = state[1]
+#     i = i + 1
+
+# plt.plot(t,yd,'r--')
+# plt.plot(t,y,'k-')
+
+# plt.xlabel('$t$(s)',fontsize=14 )
+# plt.ylabel('$y(t)$',fontsize=14 )
+# plt.title('DMP evolution')
+# plt.legend(('demonstrated', 'DMP'))
+# plt.xlim(0,t[-1])
+# plt.grid()
+# plt.show()
+
+
+
+
+########### Test SE(3) dmp
 folderPath = pathlib.Path(__file__).parent.resolve()
 
 if os.name == 'nt': # the OS is Windows
-    data = scipy.io.loadmat(str(folderPath) +'\\example_data.mat')
+    data = scipy.io.loadmat(str(folderPath) +'\\example_SE3.mat')
 else:   # the OS is Linux
-    data = scipy.io.loadmat(str(folderPath) +'/example_data.mat')
+    data = scipy.io.loadmat(str(folderPath) +'/example_SE3.mat')
 
-pd = data['p1']
+x_train = data['x_data']
 
-yd = pd[:,1]
-y = np.zeros(yd.size)
+p_train = np.array(x_train[:3,:])
+Q_train = np.array(x_train[-4:,:])
 
 dt = 0.001
-t = np.array(list(range(yd.size))) * dt
+t = np.array(list(range(p_train[1,:].size))) * dt
 
-dmpx = dmp(40, t[-1], kernelType, canonicalType)
-dmpx.train(dt, yd)
-
-# y_offset = 0.1
-# goal_offset = 0.1
-# tau = 0.7
-y_offset = 0.0
-goal_offset = 0.0
-tau = 1
+dmpTask = dmpSE3(20, t[-1])
+dmpTask.train(dt, p_train, Q_train, True)
 
 
-state = np.array([0, yd[0]+y_offset, 0])
-state_dot = np.zeros(3)
 
-dmpx.set_init_position(yd[0]+y_offset)
-dmpx.set_goal(yd[-1]+goal_offset)
-dmpx.set_tau(tau)
 
-i = 0
-for ti in t:
-    state = state + state_dot * dt
-    state_dot[0], state_dot[1], state_dot[2] = dmpx.get_state_dot( state[0], state[1], state[2])
-    y[i] = state[1]
-    i = i + 1
 
-plt.plot(t,yd,'r--')
-plt.plot(t,y,'k-')
+# p_0_offset = np.array([0.1, -0.2, 0.05])
+# p_goal_offset = np.array([0.2, -0.4, 0.15])
+# Q_0_offset = rot2quat(rotX(pi/3))
+# Q_goal_offset = rot2quat(rotZ(pi/3))
 
-plt.xlabel('$t$(s)',fontsize=14 )
-plt.ylabel('$y(t)$',fontsize=14 )
-plt.title('DMP evolution')
-plt.legend(('demonstrated', 'DMP'))
-plt.xlim(0,t[-1])
-plt.grid()
-plt.show()
+p_0_offset = np.zeros(3)
+p_goal_offset = np.zeros(3)
+Q_0_offset = np.array([1, 0, 0, 0])
+Q_goal_offset = np.array([1, 0, 0, 0])
+
+
+
+p0 = p_train[:,0] + p_0_offset
+pT = p_train[:,-1] + p_goal_offset
+
+Q0 = quatProduct(  Q_goal_offset, Q_train[:,0] )
+QT = quatProduct(  Q_goal_offset, Q_train[:,-1])
+
+dmpTask.set_init_pose(p0, Q0)
+dmpTask.set_goal(pT, QT)
+
+dmpTask.set_tau(0.7)
+
+dmpTask.plotResponse(dt,p0,Q0,2500)
+
+
+
+
+
+
+# plot results
+fig = plt.figure(figsize=(4, 7))
+
+fig.suptitle('Training dataset')
+
+for i in range(3):
+    axs = fig.add_axes([0.21, ((5-i)/6)*0.8+0.2, 0.7, 0.11])
+    axs.plot(t, p_train[i, :], 'k', linewidth=1.0)
+    axs.set_xlim([0, t[-1]])
+    axs.set_ylabel('$p_' + str(i+1) + '(t)$ [m]',fontsize=14 )
+    axs.set_xticks([])
+
+for i in range(4):
+    axs = fig.add_axes([0.21, ((5-(i+3))/6)*0.8+0.2, 0.7, 0.11])
+    axs.plot(t, Q_train[i, :], 'k', linewidth=1.0)
+    axs.set_xlim([0, t[-1]])
+    axs.set_ylabel('$Q_' + str(i+1) + '(t)$ [rad]',fontsize=14 )
     
+    if i==3:
+        axs.set_xlabel('Time (s)',fontsize=14 )
+    else:
+        axs.set_xticks([])
+
+
+plt.show()
 
