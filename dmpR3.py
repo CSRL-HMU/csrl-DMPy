@@ -1,5 +1,4 @@
 from dmp import *
-from orientation import *
 from CSRL_math import *
 import numpy as np
 
