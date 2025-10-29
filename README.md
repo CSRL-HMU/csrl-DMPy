@@ -10,6 +10,11 @@ For the orientation part, the method developed by Koutras et al. is utilized:
 
 [3] Koutras, L., Doulgeri, Z.. (2020). A correct formulation for the Orientation Dynamic Movement Primitives for robot control in the Cartesian space. Proceedings of the Conference on Robot Learning, in Proceedings of Machine Learning Research. 100:293-302 Available from https://proceedings.mlr.press/v100/koutras20a.html.
 
+<p align="center">
+  <img src="./doc/SE3_DMP.png" height="175" />
+</p>
+
+
 
 The research project "CARPOS - Coachable Robot for Fruit Picking Operations" is implemented in the framework of H.F.R.I call "Basic Research Financing (Horizontal support of all Sciences)" under the National Recovery and Resilience Plan "Greece 2.0" funded by the European Union – NextGenerationEU(H.F.R.I. Project Number: 16523).
 
