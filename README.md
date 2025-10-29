@@ -11,7 +11,7 @@ For the orientation part, the method developed by Koutras et al. is utilized:
 [3] Koutras, L., Doulgeri, Z.. (2020). A correct formulation for the Orientation Dynamic Movement Primitives for robot control in the Cartesian space. Proceedings of the Conference on Robot Learning, in Proceedings of Machine Learning Research. 100:293-302 Available from https://proceedings.mlr.press/v100/koutras20a.html.
 
 <p align="center">
-  <img src="./doc/SE3_DMP.png" height="175" />
+  <img src="./doc/SE3_DMP.png" height="600" />
 </p>
 
 
